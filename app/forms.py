@@ -56,3 +56,6 @@ class UpdateEmail(FlaskForm):
             user = User.query.filter_by(email=email.data).first()
             if user:
                 raise ValidationError('Email is taken, please chose a different one.')
+
+class DeleteConfirm(FlaskForm):
+    submit = SubmitField("Delete")

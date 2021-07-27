@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename
 from werkzeug.security import check_password_hash
 
 from app import app, db
-from app.forms import LoginForm, SignUpForm, UserDescription, UploadFileForm, UpdatePassword, UpdateEmail
+from app.forms import LoginForm, SignUpForm, UserDescription, UploadFileForm, UpdatePassword, UpdateEmail, DeleteConfirm
 from app.models import User, Post
 
 @app.route('/')
@@ -111,10 +111,15 @@ def change_email():
 		form.email.data = current_user.email
 	return render_template('update_email.html', form=form)
 
-@app.route('/account/delete')
+@app.route('/account/delete', methods=['GET', 'POST'])
 @login_required
 def delete_account():
-	pass
+	form = DeleteConfirm()
+	if form.validate_on_submit():
+		User.query.filter_by(id=current_user.id).delete()
+		db.session.commit()
+		return redirect(url_for('index'))
+	return render_template('delete_account.html', form=form)
 
 @app.route('/upload_file', methods=['GET', 'POST'])
 @login_required
