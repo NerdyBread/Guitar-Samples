@@ -52,20 +52,21 @@ def signUp():
 		flash('Thank you for signing up')
 		return redirect(url_for('login'))
 	return render_template('signUp.html', title='Sign Up', form=form)
-  
+
 @app.route("/user/<string:username>", methods=['GET', 'POST'])
 def profile(username):
-    form = UserDescription()
-    user = User.query.filter_by(username=username).first_or_404()
-    samples = Post.query.filter_by(author=user)
-    image_file = url_for('static', filename=f"profile_pics/{user.image_file}")
-  
-    if form.validate_on_submit():
-        user.user_desc = form.description.data
-        db.session.commit()
-        flash('Your description has been updated!')
-        return redirect(url_for('index'))
-    return render_template('user_profile.html', samples=samples, user=user, image_file=image_file, form=form)
+	form = UserDescription()
+	user = User.query.filter_by(username=username).first_or_404()
+	samples = Post.query.filter_by(author=user)
+	image_file = url_for('static', filename=f"profile_pics/{user.image_file}")
+
+	if form.validate_on_submit():
+		user.user_desc = form.description.data
+		db.session.commit()
+		flash('Your description has been updated!')
+		return redirect(url_for('index'))
+	return render_template('user_profile.html', samples=samples, user=user, image_file=image_file, form=form)
+
 
 
 @app.route('/admin')
