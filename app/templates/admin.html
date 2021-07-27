@@ -1,0 +1,16 @@
+<h1>Guitar Samples Admin Panel</h1>
+
+<table>
+	<th>User ID</th>
+	<th>Username</th>
+	<th>Email</th>
+	{% for user in users %}
+		{% if user.username != "Administrator" %}
+		<tr>
+			<td>{{ user.id }}</td>
+			<td>{{ user.username }}</td>
+			<td>{{ user.email }}</td>
+		</tr>
+		{% endif %}
+	{% endfor %}
+</table>
