@@ -131,3 +131,6 @@ dmypy.json
 app.db
 .vscode
 *.key
+
+*.wav
+*.mp3
