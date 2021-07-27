@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, FileField, SelectField
-from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
+from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Length
 from app.models import User
 
 class LoginForm(FlaskForm):
@@ -25,8 +25,12 @@ class SignUpForm(FlaskForm):
 
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
-        if user is not None:
-            raise ValidationError('Email address is taken.')
+        if user:
+            raise ValidationError('Please use a different email address.')
+
+class UserDescription(FlaskForm):
+    description = StringField('Update your description', validators=[Length(max=120)])
+    submit = SubmitField('Update')
 
 class UploadFileForm(FlaskForm):
 	genres = ["Placeholder1", "Placeholder2", "Placeholder3"]
@@ -40,4 +44,3 @@ class UpdatePassword(FlaskForm):
 	new_password = StringField('Enter new password', validators=[DataRequired()])
 	new_password_confirmation = StringField('Re-enter new password', validators=[DataRequired(), EqualTo("new_password")])
 	submit = SubmitField('Submit')
-						
