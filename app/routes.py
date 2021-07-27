@@ -41,31 +41,29 @@ def logout():
 
 @app.route('/signUp', methods=['GET', 'POST'])
 def signUp():
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
-    form = SignUpForm()
-    if form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data)
-        user.set_password(form.password.data)
-        db.session.add(user)
-        db.session.commit()
-        flash('Thank you for signing up')
-        return redirect(url_for('login'))
-    return render_template('signUp.html', title='Sign Up', form=form)
+	if current_user.is_authenticated:
+		return redirect(url_for('index'))
+	form = SignUpForm()
+	if form.validate_on_submit():
+		user = User(username=form.username.data, email=form.email.data)
+		user.set_password(form.password.data)
+		db.session.add(user)
+		db.session.commit()
+		flash('Thank you for signing up')
+		return redirect(url_for('login'))
+	return render_template('signUp.html', title='Sign Up', form=form)
   
-    @app.route("/user/<string:username>", methods=['GET', 'POST'])
-    def profile(username):
-      form = UserDescription()
-      user = User.query.filter_by(username=username).first_or_404()
-      samples = Post.query.filter_by(author=user)
-      image_file = url_for('static', filename=f"profile_pics/{user.image_file}")
-
-      if form.validate_on_submit():
-        db.session.commit()
-        flash('Your description has been updated!')
-        return redirect(url_for('index'))
-
-      return render_template('user_profile.html', samples=samples, user=user, image_file=image_file, form=form)
+@app.route("/user/<string:username>", methods=['GET', 'POST'])
+def profile(username):
+	form = UserDescription()
+	user = User.query.filter_by(username=username).first_or_404()
+	samples = Post.query.filter_by(author=user)
+	image_file = url_for('static', filename=f"profile_pics/{user.image_file}")
+	if form.validate_on_submit():
+		db.session.commit()
+		flash('Your description has been updated!')
+		return redirect(url_for('index'))
+	return render_template('user_profile.html', samples=samples, user=user, image_file=image_file, form=form)
 
 @app.route('/admin')
 def admin():
