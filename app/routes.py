@@ -57,7 +57,7 @@ def admin():
 	if current_user.username != "Administrator":
 		return redirect(url_for('index'))
 	else:
-		return render_template('admin.html')
+		return render_template('admin.html', users=User.query.all())
 
 @app.route('/upload_file', methods=['GET', 'POST'])
 @login_required
