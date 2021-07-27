@@ -130,6 +130,7 @@ dmypy.json
 
 app.db
 run.py
+.DS_Store
 .vscode
 *.key
 
