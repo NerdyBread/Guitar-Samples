@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Upload new File</h1>
+<form method=post enctype=multipart/form-data>
+	{{ form.hidden_tag() }}
+	<p>
+		{{ form.file.label }} <br>
+		{{ form.file(size=20) }} <br>
+		{% for error in form.file.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+	</p>
+	<p>
+		{{ form.description.label }} <br>
+		{{ form.description(size=80) }} <br>
+		{% for error in form.description.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+	</p>
+	<p>
+		{{ form.genre.label }} <br>
+		{{ form.genre() }} <br>
+		{% for error in form.genre.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+	</p>
+	<p>{{ form.submit() }}</p>
+</form>
+{% endblock %}
