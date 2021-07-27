@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename
 from werkzeug.security import check_password_hash
 
 from app import app, db
-from app.forms import LoginForm, SignUpForm, UserDescription, UploadFileForm, UpdatePassword
+from app.forms import LoginForm, SignUpForm, UserDescription, UploadFileForm, UpdatePassword, UpdateEmail
 from app.models import User, Post
 
 @app.route('/')
@@ -55,29 +55,17 @@ def signUp():
   
 @app.route("/user/<string:username>", methods=['GET', 'POST'])
 def profile(username):
-  form = UserDescription()
-  user = User.query.filter_by(username=username).first_or_404()
-  samples = Post.query.filter_by(author=user)
-  image_file = url_for('static', filename=f"profile_pics/{user.image_file}")
-
-  if form.validate_on_submit():
-    user.user_desc = form.description.data
-    db.session.commit()
-    flash('Your description has been updated!')
-    return redirect(url_for('index'))
-
-  return render_template('user_profile.html', samples=samples, user=user, image_file=image_file, form=form)
-
-	form = UserDescription()
-	user = User.query.filter_by(username=username).first_or_404()
-	samples = Post.query.filter_by(author=user)
-	image_file = url_for('static', filename=f"profile_pics/{user.image_file}")
+    form = UserDescription()
+    user = User.query.filter_by(username=username).first_or_404()
+    samples = Post.query.filter_by(author=user)
+    image_file = url_for('static', filename=f"profile_pics/{user.image_file}")
   
-	if form.validate_on_submit():
-		db.session.commit()
-		flash('Your description has been updated!')
-		return redirect(url_for('index'))
-	return render_template('user_profile.html', samples=samples, user=user, image_file=image_file, form=form)
+    if form.validate_on_submit():
+        user.user_desc = form.description.data
+        db.session.commit()
+        flash('Your description has been updated!')
+        return redirect(url_for('index'))
+    return render_template('user_profile.html', samples=samples, user=user, image_file=image_file, form=form)
 
 
 @app.route('/admin')
@@ -110,10 +98,18 @@ def change_password():
 			return redirect(url_for('account/password'))
 	return render_template('changePassword.html', form=form)
 
-@app.route('/account/email')
+@app.route('/account/email', methods=['GET', 'POST'])
 @login_required
 def change_email():
-	pass
+	form = UpdateEmail()
+	if form.validate_on_submit():
+		current_user.email = form.email.data
+		db.session.commit()
+		flash('Your email has been updated!')
+		return redirect(url_for('index'))
+	elif request.method == 'GET':
+		form.email.data = current_user.email
+	return render_template('update_email.html', form=form)
 
 @app.route('/account/delete')
 @login_required

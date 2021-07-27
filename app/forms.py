@@ -1,4 +1,5 @@
 from flask_wtf import FlaskForm
+from flask_login import current_user
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, FileField
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Length
 from app.models import User
@@ -44,3 +45,14 @@ class UpdatePassword(FlaskForm):
 	new_password = StringField('Enter new password', validators=[DataRequired()])
 	new_password_confirmation = StringField('Re-enter new password', validators=[DataRequired(), EqualTo("new_password")])
 	submit = SubmitField('Submit')
+
+
+class UpdateEmail(FlaskForm):
+    email = StringField('Enter new password', validators=[DataRequired(), Email()])
+    submit = SubmitField('Submit')
+
+    def validate_email(self, email):
+        if email.data != current_user.email:
+            user = User.query.filter_by(email=email.data).first()
+            if user:
+                raise ValidationError('Email is taken, please chose a different one.')

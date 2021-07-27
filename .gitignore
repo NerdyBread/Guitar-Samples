@@ -129,6 +129,7 @@ dmypy.json
 .pyre/
 
 app.db
+run.py
 .vscode
 *.key
 
