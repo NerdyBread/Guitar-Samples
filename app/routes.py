@@ -52,6 +52,12 @@ def signUp():
 		return redirect(url_for('login'))
 	return render_template('signUp.html', title='Sign Up', form=form)
 
+@app.route('/admin')
+def admin():
+	if current_user.username != "Administrator":
+		return redirect(url_for('index'))
+	else:
+		return render_template('admin.html')
 
 @app.route('/upload_file', methods=['GET', 'POST'])
 @login_required
