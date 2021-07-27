@@ -4,9 +4,10 @@ from flask import flash, redirect, render_template, url_for, request
 from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
 from werkzeug.utils import secure_filename
+from werkzeug.security import check_password_hash
 
 from app import app, db
-from app.forms import LoginForm, SignUpForm, UploadFileForm
+from app.forms import LoginForm, SignUpForm, UploadFileForm, UpdatePassword
 from app.models import User, Post
 
 @app.route('/')
@@ -58,6 +59,39 @@ def admin():
 		return redirect(url_for('index'))
 	else:
 		return render_template('admin.html', users=User.query.all())
+
+@app.route('/account')
+@login_required
+def account():
+	return render_template('updateAccount.html')
+
+"""Account management subpages"""
+@app.route('/account/password', methods=['GET', 'POST'])
+@login_required
+def change_password():
+	form = UpdatePassword()
+	if form.validate_on_submit():
+		old_password = form.old_password.data
+		correct = check_password_hash(current_user.password_hash, old_password)
+		if correct:
+			current_user.set_password(form.new_password.data)
+			db.session.commit()
+			flash("Password updated")
+			return redirect(url_for('account'))
+		else:
+			flash("Incorrect password")
+			return redirect(url_for('account/password'))
+	return render_template('changePassword.html', form=form)
+
+@app.route('/account/email')
+@login_required
+def change_email():
+	pass
+
+@app.route('/account/delete')
+@login_required
+def delete_account():
+	pass
 
 @app.route('/upload_file', methods=['GET', 'POST'])
 @login_required

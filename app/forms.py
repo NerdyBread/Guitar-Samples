@@ -21,12 +21,12 @@ class SignUpForm(FlaskForm):
     def validate_username(self, username):
         user = User.query.filter_by(username=username.data).first()
         if user is not None:
-            raise ValidationError('Please use a different username.')
+            raise ValidationError('Username is taken.')
 
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
         if user is not None:
-            raise ValidationError('Please use a different email address.')
+            raise ValidationError('Email address is taken.')
 
 class UploadFileForm(FlaskForm):
 	genres = ["Placeholder1", "Placeholder2", "Placeholder3"]
@@ -34,3 +34,10 @@ class UploadFileForm(FlaskForm):
 	description = StringField('Description', validators=[DataRequired(), Length(min=10, max=80)])
 	genre = SelectField('Select genre', choices=genres, validators=[DataRequired()])
 	submit = SubmitField('Upload')
+
+class UpdatePassword(FlaskForm):
+	old_password = StringField('Enter current password', validators=[DataRequired()])
+	new_password = StringField('Enter new password', validators=[DataRequired()])
+	new_password_confirmation = StringField('Re-enter new password', validators=[DataRequired(), EqualTo("new_password")])
+	submit = SubmitField('Submit')
+						

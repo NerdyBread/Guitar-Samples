@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form method="get" action="{{ url_for('change_password') }}">
+	<button type="submit">Change password</button>
+</form>
+
+<form method="get" action="{{ url_for('change_email') }}">
+	<button type="submit">Change email</button>
+</form>
+
+<form action="{{ url_for('delete_account') }}">
+	<button type="submit">Delete account</button>
+</form>
+
+{% endblock %}
