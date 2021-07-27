@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename
 from werkzeug.security import check_password_hash
 
 from app import app, db
-from app.forms import LoginForm, SignUpForm, UserDescription, UploadFileForm, UpdatePassword
+from app.forms import LoginForm, SignUpForm, UserDescription, UploadFileForm, UpdatePassword, UpdateEmail, DeleteConfirm
 from app.models import User, Post
 
 @app.route('/')
@@ -68,6 +68,7 @@ def profile(username):
 	return render_template('user_profile.html', samples=samples, user=user, image_file=image_file, form=form)
 
 
+
 @app.route('/admin')
 def admin():
 	if current_user.username != "Administrator":
@@ -98,15 +99,28 @@ def change_password():
 			return redirect(url_for('account/password'))
 	return render_template('changePassword.html', form=form)
 
-@app.route('/account/email')
+@app.route('/account/email', methods=['GET', 'POST'])
 @login_required
 def change_email():
-	pass
+	form = UpdateEmail()
+	if form.validate_on_submit():
+		current_user.email = form.email.data
+		db.session.commit()
+		flash('Your email has been updated!')
+		return redirect(url_for('index'))
+	elif request.method == 'GET':
+		form.email.data = current_user.email
+	return render_template('update_email.html', form=form)
 
-@app.route('/account/delete')
+@app.route('/account/delete', methods=['GET', 'POST'])
 @login_required
 def delete_account():
-	pass
+	form = DeleteConfirm()
+	if form.validate_on_submit():
+		User.query.filter_by(id=current_user.id).delete()
+		db.session.commit()
+		return redirect(url_for('index'))
+	return render_template('delete_account.html', form=form)
 
 @app.route('/upload_file', methods=['GET', 'POST'])
 @login_required
