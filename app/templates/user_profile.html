@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Profile Page</h1>
+    <p>{{ user.user_desc }}</p>
+    <img src="{{ image_file }}">
+    {% if current_user.is_authenticated %}
+        <form action="" method="post">
+            {{ form.hidden_tag() }}
+            <p>
+                {{ form.description.label }}<br>
+                {{ form.description(size=120) }}<br>
+                {% for error in form.description.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            <p>{{ form.submit() }}</p>
+        </form>
+    {% endif %}
+
+{% endblock %}
