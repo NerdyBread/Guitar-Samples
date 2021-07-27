@@ -11,6 +11,13 @@
 			<span style="color: red;">[{{ error }}]</span>
 			{% endfor %}
         </p>
+		<p>
+            {{ form.email.label }}<br>
+            {{ form.email(size=24) }}
+			{% for error in form.email.errors %}
+			<span style="color: red;">[{{ error }}]</span>
+			{% endfor %}
+        </p>
         <p>
             {{ form.password.label }}<br>
             {{ form.password(size=32) }}
@@ -21,7 +28,4 @@
         <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
         <p>{{ form.submit() }}</p>
     </form>
-	<a href="{{ url_for('googlelogin')}}">
-		<button>Login in with google</button>
-	</a>
 {% endblock %}
