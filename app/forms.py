@@ -2,6 +2,7 @@ from flask_wtf import FlaskForm
 from flask_login import current_user
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, FileField
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Length
+from flask_wtf.file import FileAllowed
 from app.models import User
 
 class LoginForm(FlaskForm):
@@ -28,10 +29,7 @@ class SignUpForm(FlaskForm):
         user = User.query.filter_by(email=email.data).first()
         if user:
             raise ValidationError('Please use a different email address.')
-
-class UserDescription(FlaskForm):
-    description = StringField('Update your description', validators=[Length(max=120)])
-    submit = SubmitField('Update')
+    
 
 class UploadFileForm(FlaskForm):
 	genres = ["Placeholder1", "Placeholder2", "Placeholder3"]
@@ -59,3 +57,10 @@ class UpdateEmail(FlaskForm):
 
 class DeleteConfirm(FlaskForm):
     submit = SubmitField("Delete")
+
+class UpdateProfile(FlaskForm):
+    description = StringField('Update your description', validators=[Length(max=120)])
+
+    picture = FileField('Update profile picture', validators=[FileAllowed(['jpg', 'png'])])
+
+    submit = SubmitField('Update')

@@ -1,5 +1,6 @@
 import os
-
+import secrets
+from PIL import Image
 from flask import flash, redirect, render_template, url_for, request
 from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
@@ -7,7 +8,7 @@ from werkzeug.utils import secure_filename
 from werkzeug.security import check_password_hash
 
 from app import app, db
-from app.forms import LoginForm, SignUpForm, UserDescription, UploadFileForm, UpdatePassword, UpdateEmail, DeleteConfirm
+from app.forms import LoginForm, SignUpForm, UpdateProfile, UploadFileForm, UpdatePassword, UpdateEmail, DeleteConfirm
 from app.models import User, Post
 
 @app.route('/')
@@ -53,19 +54,13 @@ def signUp():
 		return redirect(url_for('login'))
 	return render_template('signUp.html', title='Sign Up', form=form)
 
-@app.route("/user/<string:username>", methods=['GET', 'POST'])
+@app.route("/user/<string:username>", methods=['GET'])
 def profile(username):
-	form = UserDescription()
 	user = User.query.filter_by(username=username).first_or_404()
 	samples = Post.query.filter_by(author=user)
 	image_file = url_for('static', filename=f"profile_pics/{user.image_file}")
 
-	if form.validate_on_submit():
-		user.user_desc = form.description.data
-		db.session.commit()
-		flash('Your description has been updated!')
-		return redirect(url_for('index'))
-	return render_template('user_profile.html', samples=samples, user=user, image_file=image_file, form=form)
+	return render_template('user_profile.html', samples=samples, user=user, image_file=image_file)
 
 
 
@@ -121,6 +116,37 @@ def delete_account():
 		db.session.commit()
 		return redirect(url_for('index'))
 	return render_template('delete_account.html', form=form)
+
+def save_picture(form_picture):
+	random_hex = secrets.token_hex(8)
+	_, f_ext = os.path.splitext(form_picture.filename)
+	picture_fn = random_hex + f_ext
+	picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_fn)
+
+	output_size = (900, 900)
+	i = Image.open(form_picture)
+	i.thumbnail(output_size)
+
+	i.save(picture_path)
+
+	return picture_fn
+
+@app.route('/account/profile', methods=['GET', 'POST'])
+@login_required
+def update_profile():
+	form = UpdateProfile()
+	if form.validate_on_submit():
+		current_user.user_desc = form.description.data
+		if form.picture.data:
+			picture_file = save_picture(form.picture.data)
+			current_user.image_file = picture_file
+		db.session.commit()
+		flash('Your profile has been updated!')
+		return redirect(url_for('profile', username=current_user.username))
+	elif request.method == 'GET':
+		form.description.data = current_user.user_desc
+	return render_template('update_profile.html', title='Update Profile', form=form)	
+
 
 @app.route('/upload_file', methods=['GET', 'POST'])
 @login_required
